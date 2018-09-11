@@ -1,0 +1,7 @@
+技术说明：
+
+用户权限：shiro
+dao：    mybaties-plus      ok
+连接池： druid              ok
+中间间：  mq                ok
+缓存 ：  ignate / redis     ok
