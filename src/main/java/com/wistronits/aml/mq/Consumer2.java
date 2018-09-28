@@ -1,13 +1,16 @@
+/*
 package com.wistronits.aml.mq;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+*/
 /**
  * @author gzp
  * @date 2018/8/29 9:43
- */
+ *//*
+
 @Component
 public class Consumer2 {
 	@JmsListener(destination = "mytest.queue")
@@ -17,3 +20,4 @@ public class Consumer2 {
 		return "return message" + text;
 	}
 }
+*/

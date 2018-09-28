@@ -1,3 +1,4 @@
+/*
 package com.wistronits.aml.mq;
 
 import javax.jms.Destination;
@@ -21,4 +22,4 @@ public class Producer {
 	public void consumerMessage(String text) {
 		System.out.println("从out.queue队列 收到的回复报文为：" + text);
 	}
-}
+}*/

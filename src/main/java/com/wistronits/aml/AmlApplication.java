@@ -1,6 +1,7 @@
 package com.wistronits.aml;
 
 import com.wistronits.aml.filter.CustomFilter;
+import com.wistronits.aml.filter.CustomFilter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-@MapperScan("com.wistronits.aml.mapper")
+@MapperScan(basePackages = {"com.wistronits.aml.chat.mapper", "com.wistronits.aml.product.mapper"})
 @Controller
 @EnableScheduling
 @EnableCaching
@@ -31,35 +32,29 @@ public class AmlApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AmlApplication.class, args);
-		System.out.println("                                     _ooOoo_");
-		System.out.println("                                    o8888888o");
-		System.out.println("                                    88\" . \"88");
-		System.out.println("                                    (| -_- |)");
-		System.out.println("                                    O\\  =  /O");
-		System.out.println("                                 ____/`---'\\____");
-		System.out.println("                               .'  \\\\|     |//  `.");
-		System.out.println("                              /  \\\\|||  :  |||//  \\");
-		System.out.println("                             /  _||||| -:- |||||-  \\");
-		System.out.println("                             |   | \\\\\\  -  /// |   |");
-		System.out.println("                             | \\_|  ''\\---/''  |   |");
-		System.out.println("                             \\  .-\\__  `-`  ___/-. /");
-		System.out.println("                           ___`. .'  /--.--\\  `. . __ ");
-		System.out.println("                        .\"\" '<  `.___\\_<|>_/___.'  >'\"\".");
-		System.out.println("                       | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |");
-		System.out.println("                       \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /");
-		System.out.println("                  ======`-.____`-.___\\_____/___.-`____.-'======");
-		System.out.println("                                     `=---='");
-		System.out.println("                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-		System.out.println("                             佛祖保佑        永无BUG");
+//		System.out.println("                                     _ooOoo_");
+//		System.out.println("                                    o8888888o");
+//		System.out.println("                                    88\" . \"88");
+//		System.out.println("                                    (| -_- |)");
+//		System.out.println("                                    O\\  =  /O");
+//		System.out.println("                                 ____/`---'\\____");
+//		System.out.println("                               .'  \\\\|     |//  `.");
+//		System.out.println("                              /  \\\\|||  :  |||//  \\");
+//		System.out.println("                             /  _||||| -:- |||||-  \\");
+//		System.out.println("                             |   | \\\\\\  -  /// |   |");
+//		System.out.println("                             | \\_|  ''\\---/''  |   |");
+//		System.out.println("                             \\  .-\\__  `-`  ___/-. /");
+//		System.out.println("                           ___`. .'  /--.--\\  `. . __ ");
+//		System.out.println("                        .\"\" '<  `.___\\_<|>_/___.'  >'\"\".");
+//		System.out.println("                       | | :  `- \\`.;`\\ _ /`;.`/ - ` : | |");
+//		System.out.println("                       \\  \\ `-.   \\_ __\\ /__ _/   .-` /  /");
+//		System.out.println("                  ======`-.____`-.___\\_____/___.-`____.-'======");
+//		System.out.println("                                     `=---='");
+//		System.out.println("                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+//		System.out.println("                             佛祖保佑        永无BUG");
 	}
 
-	private CorsConfiguration buildConfig() {
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.addAllowedOrigin("*");
-		corsConfiguration.addAllowedHeader("*");
-		corsConfiguration.addAllowedMethod("*");
-		return corsConfiguration;
-	}
+
 
 	/**
 	 * 跨域过滤器
@@ -72,7 +67,13 @@ public class AmlApplication {
 		return new CorsFilter(source);
 	}
 
-
+	private CorsConfiguration buildConfig() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOrigin("*");
+		corsConfiguration.addAllowedHeader("*");
+		corsConfiguration.addAllowedMethod("*");
+		return corsConfiguration;
+	}
 	/**
 	 * 注册过滤器
 	 * @return

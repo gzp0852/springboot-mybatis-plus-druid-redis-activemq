@@ -1,3 +1,4 @@
+/*
 package com.wistronits.aml;
 
 import javax.jms.Destination;
@@ -26,4 +27,4 @@ public class SpringbootJmsApplicationTests {
 		}
 	}
 
-}
+}*/
