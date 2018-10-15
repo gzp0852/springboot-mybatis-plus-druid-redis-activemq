@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>WebChat | 登陆</title>
+		<link href="source/css/login.css" rel='stylesheet' type='text/css' />
+		<script src="plugins/jquery/jquery-2.1.4.min.js"></script>
+		<script src="plugins/layer/layer.js"></script>
+		<script src="source/js/url.js"></script>
+	</head>
+
+	<body>
+		<h1>WebChat</h1>
+		<div class="login-form">
+			<div class="close"> </div>
+			<div class="head-info">
+				<label class="lbl-1"></label>
+				<label class="lbl-2"></label>
+				<label class="lbl-3"></label>
+			</div>
+			<div class="clear"> </div>
+			<div class="avtar"><img src="source/img/avtar.png" /></div>
+
+			<div class="key">
+				<input type="text" id="username" name="userid" placeholder="请输入账号" onclick="revert()">
+			</div>
+
+			<div class="key">
+				<input type="password" id="password" name="password" placeholder="请输入密码">
+			</div>
+			<div class="signin">
+				<input type="submit" id="submit" value="Login" onclick="login()">
+			</div>
+
+		</div>
+
+		<script>
+			isLogin();
+			$('#username,#password').change(function() {
+				$('#submit').attr('value', 'Login').css('background', '#3ea751');
+			});
+			function revert() {
+				$('#submit').attr('value', 'Login').css('background', '#3ea751');
+			}
+			function login() {
+				var username = $('#username').val();
+				var password = $('#password').val();
+				if(isNull(username) && isNull(password)) {
+					$('#submit').attr('value', '请输入账号和密码!!!').css('background', 'red');
+					return false;
+				}
+				if(isNull(username)) {
+					$('#submit').attr('value', '请输入账号!!!').css('background', 'red');
+					return false;
+				}
+				if(isNull(password)) {
+					$('#submit').attr('value', '请输入密码!!!').css('background', 'red');
+					return false;
+				}
+				//if(username != 'Amaya' || password != '123456'){
+				//	$('#submit').attr('value','账号或密码错误!!!').css('background','red');
+				//	return false;
+				//}
+				else {
+					$('#submit').attr('value', 'Logining~');
+				}
+
+				$.ajax({
+					type: "post",
+					contentType: 'application/json',
+					dataType: 'json',
+					url: `${url}/chat/user/login`,
+					async: true,
+					data: JSON.stringify({
+						userName: username,
+						password: password
+					}),
+					success: function(result) {
+						console.log(result.code);
+						if(result.code === 10001) {
+							$('#submit').attr('value', '账号或密码错误!!!').css('background', 'red');
+						} else if(result.code === -1) {
+							layer.msg('连接超时,请重新登陆!', {
+						        offset: 0,
+						        shift: 6
+						    });
+						    $('#submit').attr('value', 'Login').css('background', '#3ea751');
+						}else if(result.code === 0) {
+							localStorage.setItem("currUser", JSON.stringify(result.data.user));
+							localStorage.setItem("token", result.data.token);
+							location.href = 'index.html';
+						}
+					},
+					error: function(xhr, textStatus, errorThrown) {
+						console.log(textStatus + " @@@@@@@@" + errorThrown);
+						layer.msg('出错了， 请稍后登录!', {
+						        offset: 0,
+						        shift: 6
+						});
+						$('#submit').attr('value', 'Login').css('background', '#3ea751');
+					}
+				});
+			}
+
+			function isLogin() {
+				var token = localStorage.getItem("token");
+				console.log(token);
+				if(token) {
+					location.href = 'index.html';
+				}
+			}
+
+			/**
+			 * check the param if it's null or '' or undefined
+			 * @param input
+			 * @returns {boolean}
+			 */
+			function isNull(input) {
+				if(input == null || input == '' || input == undefined) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		</script>
+	</body>
+
+</html>

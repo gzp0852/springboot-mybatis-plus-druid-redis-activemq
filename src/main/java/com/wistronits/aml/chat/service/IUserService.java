@@ -26,4 +26,11 @@ public interface IUserService extends IService<User> {
 
 	List chatAll(Messages msg, HttpServletRequest request) throws IOException;
 
+	User getByUserId(String userId);
+
+	void updateByUserId(User user);
+
+	void updatePwd(User user);
+
+	Result offline(String token) throws Exception;
 }

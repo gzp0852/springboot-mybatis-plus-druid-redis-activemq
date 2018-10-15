@@ -89,18 +89,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 		// TODO
 		// 登录前判断用户是否已经登录，是的话将前一个用户下线。
-		// List<String> tokenList = redisClient.lrange(Constant.USER, 0, -1);
 		List<Object> tokenList = redisUtil.lGet(Constant.USER, 0, -1);
 		int index = 0;
 		if (tokenList != null && !tokenList.isEmpty()) {
 			for (Object obj : tokenList) {
 				String str = obj.toString();
 				if (ObjectUtils.isNotEmpty(redisUtil.get(str))) {
-					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str), SessionUser.class);
+					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str),
+							SessionUser.class);
 					if (sessionUser.getUserId().equals(user.getUserId())) {
 						redisUtil.del(str);
 						redisUtil.lRemove(Constant.USER, index, str);
 						// 下线此用户在另一个客户端
+						redisUtil.setRemove(Constant.ONLINE, str);
 						product.offLine(str);
 						continue;
 					}
@@ -125,7 +126,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 		data.put("user", user);
 		data.put("token", token);
+
+		user.setLastIp(loginIp);
+		user.setLastTime(latestLoginTime);
+		userMapper.updateByUserId(user);
 		return ResultUtils.success(data);
+	}
+
+	@Override
+	public Result offline(String token) throws Exception{
+//		ObjectMapper mapper = new ObjectMapper();
+//		List<Object> tokenList = redisUtil.lGet(Constant.USER, 0, -1);
+//		int index = 0;
+//		if (tokenList != null && !tokenList.isEmpty()) {
+//			for (Object obj : tokenList) {
+//				String str = obj.toString();
+//				if (ObjectUtils.isNotEmpty(redisUtil.get(str))) {
+//					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str),
+//							SessionUser.class);
+//					if (StringUtils.isNotEmpty(sessionUser.getUserId())) {
+//						redisUtil.del(str);
+//						redisUtil.lRemove(Constant.USER, index, str);
+//						redisUtil.setRemove(Constant.ONLINE, str);
+//						product.offLine(str);
+//						continue;
+//					}
+//				}
+//				index++;
+//			}
+//		}
+		return ResultUtils.success(null);
 	}
 
 	@Override
@@ -146,7 +176,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 			Set<Object> set = redisUtil.sGet(Constant.ONLINE);
 			List list = new ArrayList();
 			for (Object obj : set) {
-				SessionUser user = mapper.readValue(redisUtil.get(obj.toString()).toString(), SessionUser.class);
+				SessionUser user = mapper.readValue(redisUtil.get(obj.toString()).toString(),
+						SessionUser.class);
 				list.add(user);
 			}
 			if (CollectionUtils.isNotEmpty(list)) {
@@ -160,6 +191,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 		// todo
 		return msg.getList();
 	}
+
+	@Override
+	public User getByUserId(String userId) {
+		User user = userMapper.getByUserId(userId);
+		return user;
+	}
+
+	@Override
+	public void updateByUserId(User user) {
+		userMapper.updateByUserId(user);
+	}
+
+	@Override
+	public void updatePwd(User user) {
+		userMapper.updatePwd(user);
+	}
+
 
 
 }

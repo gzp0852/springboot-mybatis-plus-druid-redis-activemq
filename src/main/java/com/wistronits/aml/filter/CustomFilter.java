@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.util.ObjectUtils;
 //import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.servlet.*;
@@ -55,9 +56,9 @@ public class CustomFilter implements Filter {
 		request = (HttpServletRequest) servletRequest;
 		response = (HttpServletResponse) servletResponse;
 
-		//this.chain.doFilter(request, response);
+		this.chain.doFilter(request, response);
 		// 获取当前页面文件名处url
-		if (isLoginOperation(this.request)) {
+		/*if (isLoginOperation(this.request)) {
 			logger.info("登录状态");
 			// 执行操作后必须doFilter
 			this.chain.doFilter(request, response);
@@ -66,7 +67,7 @@ public class CustomFilter implements Filter {
 			String token = request.getHeader("token");
 			logger.info("------------------------" + token);
 			SessionUser user = null;
-			if (token != null) {
+			if (token != null && !ObjectUtils.isEmpty(redisUtil.get(token))) {
 				String str = (String) redisUtil.get(token);
 				user = objectMapper.readValue(str, SessionUser.class);
 			}
@@ -87,7 +88,7 @@ public class CustomFilter implements Filter {
 				redisUtil.set(token, objectMapper.writeValueAsString(user), userOutTime);
 				this.chain.doFilter(request, response);
 			}
-		}
+		}*/
 
 	}
 

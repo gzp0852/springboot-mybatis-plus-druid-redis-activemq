@@ -32,6 +32,7 @@ public class User implements Serializable {
 
     private String age;
 
+    private String profile;
     /**
      * 图片路劲
      */

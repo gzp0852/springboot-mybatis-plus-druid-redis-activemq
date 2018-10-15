@@ -1,7 +1,6 @@
 package com.wistronits.aml;
 
 import com.wistronits.aml.filter.CustomFilter;
-import com.wistronits.aml.filter.CustomFilter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.servlet.Filter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 

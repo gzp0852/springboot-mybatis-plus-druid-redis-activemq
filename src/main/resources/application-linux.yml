@@ -1,0 +1,113 @@
+#数据库配置信息
+dbIp: 39.108.213.45
+dbPort: 3306
+dbName: chat
+dbUser: gzp
+dbPwd: gzp
+##mongoDB配置信息
+#mongoIp: 10.5.43.18
+#mongoPort: 27017
+#mongoDataBase: testA
+
+img:
+  location: /home/cwz/pic
+
+#redis的配置
+redisServerIp: 39.108.213.45
+#39.108.213.45
+redisServerPort: 6379
+
+userOutTime: 3000
+
+
+#服务ip
+#serverIp: 10.39.7.254
+serverIp: 39.108.213.45
+serverPort: 8081
+
+server:
+  port: ${serverPort}
+hostAddress: /home/cwz/pic/
+# 配置mybatis-plus
+mybatis-plus:
+  # 配置扫描xml
+  mapper-locations:
+    classpath*:mapper/*/*.xml
+#    classpath:/com/wistronits/aml/mapper/xml/*.xml
+  # 实体扫描，多个package用逗号或者分号分隔
+  type-aliases-package: com.wistronits.aml.product.entity;com.wistronits.aml.chat.entity
+  global-config:
+    # 逻辑删除配置
+    logic-delete-value: 0
+    logic-not-delete-value: 1
+#    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    idType: 0
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    fieldStrategy: 2
+    #驼峰下划线转换
+    dbColumnUnderline: true
+    #刷新mapper 调试神器
+    isRefresh: true
+    #数据库大写下划线转换
+    isCapitalMode: true
+
+#datasource配置信息
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    name: druidDataSource
+    platform: mysql
+    druid:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://${dbIp}:${dbPort}/${dbName}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
+      username: ${dbUser}
+      password: ${dbPwd}
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT1FROMDUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      filters: stat,wall,log4j2,config
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 2000
+  redis:
+    host: ${redisServerIp}
+    port: ${redisServerPort}
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+    timeout: 10000
+#    password: 123456
+#  activemq:
+#    broker-url: tcp://localhost:61616
+#    in-memory: true
+#    pool:
+#      enabled: false
+  devtools:
+    restart:
+      enabled: false
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,classpath:static/,file:${img.location}
+#  data:
+#    mongodb:
+#      host: ${mongoIp}
+#      port: ${mongoPort}
+#      database: ${mongoDataBase}
+
+
+logging:
+  config: classpath:log4j2.xml
+  level:
+    com.wistronits.aml: debug
+

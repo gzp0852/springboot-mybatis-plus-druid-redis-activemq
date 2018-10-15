@@ -19,7 +19,14 @@ public enum ResultCode {
 	FAIL(20101, "名称已存在"),
 	CodeFAIL(20102, "编码已存在"),
 	DELETE_ERROR(20100, "删除失败"),
-	PARAMETER_ERROR(20105,"参数错误");
+	PARAMETER_ERROR(20105,"参数错误"),
+	IMG_NOT_EMPTY(30101, "图片不存在"),
+	IMG_FORMAT_ERROR(30102, "图片类型错误"),
+	SAVE_IMG_ERROE(30103, "保存图片失败"),
+	PASSWORD_NULL(10101, "密码不能为空"),
+	PASSWORD_ERR_OLD(10103, "原密码错误"),
+	PASSWORD_SAME(10102, "与原密码相同");
+
 
 
 	/**

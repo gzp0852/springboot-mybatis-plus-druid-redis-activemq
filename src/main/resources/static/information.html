@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>WebChat | 聊天</title>
+		<link rel="stylesheet" href="plugins/amaze/css/amazeui.min.css">
+		<link rel="stylesheet" href="plugins/amaze/css/admin.css">
+		<link rel="stylesheet" href="plugins/contextjs/css/context.standalone.css">
+		<script src="plugins/jquery/jquery-2.1.4.min.js"></script>
+		<script src="plugins/amaze/js/amazeui.min.js"></script>
+		<script src="plugins/amaze/js/app.js"></script>
+		<script src="plugins/layer/layer.js"></script>
+		<script src="plugins/laypage/laypage.js"></script>
+		<script src="plugins/contextjs/js/context.js"></script>
+		<script src="source/js/sockjs.min.js"></script>
+		<script src="source/js/stomp.min.js"></script>
+		<script src="source/js/url.js"></script>
+	</head>
+
+	<body onbeforeunload="checkLeave()">
+		<div>
+			<header class="am-topbar admin-header">
+				<div class="am-topbar-brand">
+					<i class="am-icon-weixin"></i> <strong>WebChat</strong> <small>网页聊天室</small>
+				</div>
+				<button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#topbar-collapse'}"><span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span></button>
+				<div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+					<ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
+						<li class="am-dropdown" data-am-dropdown>
+							<a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:;">
+								<span id="userid"></span> <span class="am-icon-caret-down"></span>
+							</a>
+							<ul class="am-dropdown-content">
+								<li>
+									<a href="information.html"><span class="am-icon-user"></span> 资料</a>
+								</li>
+								<li>
+									<a href="info-setting.html"><span class="am-icon-cog"></span> 设置</a>
+								</li>
+								<li>
+									<a href=""><span class="am-icon-power-off"></span> 注销</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</header>
+		</div>
+		<div class="am-cf admin-main">
+			<div data-include="sidebar"></div>
+			<!-- content start -->
+			<div class="admin-content">
+				<div class="am-cf am-padding">
+					<div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">个人信息</strong> / <small>info</small></div>
+				</div>
+				<div class="am-tabs am-margin" data-am-tabs>
+					<ul class="am-tabs-nav am-nav am-nav-tabs">
+						<li class="am-active">
+							<a href="#tab1">个人信息</a>
+						</li>
+					</ul>
+					<div class="am-tabs-bd">
+						<div class="am-tab-panel am-fade am-in am-active" id="tab1">
+							<div class="am-g">
+								<c:set value="${user}" var="user" />
+								<div class="am-u-md-3"><b>昵称:</b></div>
+								<div class="am-u-md-3">
+									<span id="nickname"></span>
+								</div>
+								<div class="am-u-md-6" style="float: right">
+									<img class="am-circle" id="profilehead" width="140" height="140" src="?" alt="?" />
+								</div>
+
+								<div class="am-u-md-3"><b>性别:</b></div>
+								<div class="am-u-md-3">
+									<span id="sex"></span>
+								</div>
+								<div class="am-u-md-3"><b>年龄:</b></div>
+								<div class="am-u-md-3" >
+									<span id="age"></span>
+								</div>
+								<div class="am-u-md-3"><b>简介:</b></div>
+								<div class="am-u-md-3" id="profile">
+									<span id="profile"></span>
+								</div>
+								<div class="am-u-md-3"><b>注册时间</b></div>
+								<div class="am-u-md-3" ><span id="firsttime"></span></div>
+								<div class="am-u-md-3"><b>最后登录</b></div>
+								<div class="am-u-md-3" ><span id="lasttime"></span></div></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- content end -->
+			</div>
+
+		</div>
+
+		<a href="#" class="am-show-sm-only admin-menu" data-am-offcanvas="{target: '#admin-offcanvas'}">
+			<span class="am-icon-btn am-icon-th-list"></span>
+		</a>
+		<div data-include="footer"></div>
+
+	</body>
+
+</html>
+<script>
+	$(function() {
+		var includes = $('[data-include]');
+		jQuery.each(includes, function() {
+			var file = 'include/' + $(this).data('include') + '.html';
+			$(this).load(file);
+		});
+	});
+
+	var user = JSON.parse(localStorage.getItem("currUser"));
+	var userid = user.userName;
+	document.getElementById("userid").innerHTML = userid;
+	var id = user.userId;
+
+	$.ajax({
+		type: "post",
+		contentType: 'application/json',
+		dataType: 'json',
+		beforeSend: function(request) {
+			request.setRequestHeader("token", localStorage.getItem("token"));
+		},
+		url: `${url}/chat/user/info`,
+		async: false,
+		data: id,
+		success: function(result) {
+			if(result.code == 0) {
+				console.log("1" + result.data.profilehead);
+				document.getElementById("nickname").innerHTML = result.data.userName;
+				document.getElementById("profilehead").src = `${url}`+'/chat/user/img/'+result.data.profilehead + "?" + new Date().getTime();
+				document.getElementById("profilehead").alt = result.data.userName;
+				var sex = result.data.sex;
+				if (sex == "1") {
+					document.getElementById("sex").innerHTML = "男";
+				} else if (sex == "2") {
+					document.getElementById("sex").innerHTML = "女";
+				} else{
+					document.getElementById("sex").innerHTML = "未知"
+				}
+
+				document.getElementById("age").innerHTML = result.data.age;
+				var profile = result.data.profile;
+				if (profile==null || profile=="") {
+					document.getElementById("profile").innerHTML = "这个人很懒，什么都没留下！"
+				}else {
+					document.getElementById("profile").innerHTML = result.data.profile;
+				}
+
+				document.getElementById("firsttime").innerHTML = result.data.registerTime;
+				document.getElementById("lasttime").innerHTML = result.data.lastTime;
+				
+			} else if(result.code != 0) {
+				console.log("2" + result.msg);
+			}
+		}
+
+	});
+</script>

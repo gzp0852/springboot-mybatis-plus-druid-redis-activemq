@@ -9,6 +9,9 @@ dbPwd: gzp
 #mongoPort: 27017
 #mongoDataBase: testA
 
+img:
+  location: F://PPPP/file
+
 #redis的配置
 redisServerIp: 39.108.213.45
 #39.108.213.45
@@ -18,11 +21,13 @@ userOutTime: 3000
 
 
 #服务ip
+serverIp: 10.39.7.254
+#serverIp: 39.108.213.45
 serverPort: 8081
 
 server:
   port: ${serverPort}
-
+hostAddress: F://PPPP/file/
 # 配置mybatis-plus
 mybatis-plus:
   # 配置扫描xml
@@ -82,7 +87,8 @@ spring:
         max-wait: -1
         max-idle: 8
         min-idle: 0
-    timeout: 5000
+    timeout: 10000
+#    password: 123456
 #  activemq:
 #    broker-url: tcp://localhost:61616
 #    in-memory: true
@@ -91,6 +97,8 @@ spring:
   devtools:
     restart:
       enabled: false
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,classpath:static/
 #  data:
 #    mongodb:
 #      host: ${mongoIp}
