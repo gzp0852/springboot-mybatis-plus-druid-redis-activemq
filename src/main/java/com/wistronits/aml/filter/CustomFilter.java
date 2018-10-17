@@ -1,6 +1,7 @@
 package com.wistronits.aml.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wistronits.aml.commons.Constant;
 import com.wistronits.aml.commons.redis.RedisUtil;
 import com.wistronits.aml.commons.websocket.SessionUser;
 //import com.wistronits.aml.commons.websocket.WebSocketSendBean;
@@ -56,9 +57,9 @@ public class CustomFilter implements Filter {
 		request = (HttpServletRequest) servletRequest;
 		response = (HttpServletResponse) servletResponse;
 
-		this.chain.doFilter(request, response);
+		// this.chain.doFilter(request, response);
 		// 获取当前页面文件名处url
-		/*if (isLoginOperation(this.request)) {
+		if (isLoginOperation(this.request)) {
 			logger.info("登录状态");
 			// 执行操作后必须doFilter
 			this.chain.doFilter(request, response);
@@ -72,6 +73,9 @@ public class CustomFilter implements Filter {
 				user = objectMapper.readValue(str, SessionUser.class);
 			}
 			if (user == null) {
+				if (request.getRequestURL().toString().contains("/chat/user/img")) {
+					this.chain.doFilter(request, response);
+				}
 				try {
 					// 前缀
 					String pre = "/chatTopic/user/";
@@ -85,10 +89,10 @@ public class CustomFilter implements Filter {
 			} else {
 				logger.info("-----------------------------------------登陆后的操作");
 				user.setLoginDate(new Date());
-				redisUtil.set(token, objectMapper.writeValueAsString(user), userOutTime);
+				redisUtil.set(token, objectMapper.writeValueAsString(user));
 				this.chain.doFilter(request, response);
 			}
-		}*/
+		}
 
 	}
 
@@ -110,7 +114,11 @@ public class CustomFilter implements Filter {
 		// 登录路径
 		String login = "/chat/user/login";
 		String websocket = "/chat/chatEndpointWisely";
-		return url.contains(login) || url.contains(websocket);
+		String img = "/chat/user/img";
+		String source = "/source";
+		String plugins = "/plugins";
+		return url.contains(login) || url.contains(websocket) || url.contains(img) || url.contains(source)
+				|| url.contains(plugins);
 	}
 
 	/**

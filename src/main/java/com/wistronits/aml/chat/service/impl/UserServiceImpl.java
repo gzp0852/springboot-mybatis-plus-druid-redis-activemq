@@ -90,7 +90,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 		// TODO
 		// 登录前判断用户是否已经登录，是的话将前一个用户下线。
 		List<Object> tokenList = redisUtil.lGet(Constant.USER, 0, -1);
-		int index = 0;
 		if (tokenList != null && !tokenList.isEmpty()) {
 			for (Object obj : tokenList) {
 				String str = obj.toString();
@@ -98,15 +97,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str),
 							SessionUser.class);
 					if (sessionUser.getUserId().equals(user.getUserId())) {
-						redisUtil.del(str);
-						redisUtil.lRemove(Constant.USER, index, str);
-						// 下线此用户在另一个客户端
-						redisUtil.setRemove(Constant.ONLINE, str);
 						product.offLine(str);
 						continue;
 					}
 				}
-				index++;
 			}
 		}
 
@@ -135,27 +129,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 	@Override
 	public Result offline(String token) throws Exception{
-//		ObjectMapper mapper = new ObjectMapper();
-//		List<Object> tokenList = redisUtil.lGet(Constant.USER, 0, -1);
-//		int index = 0;
-//		if (tokenList != null && !tokenList.isEmpty()) {
-//			for (Object obj : tokenList) {
-//				String str = obj.toString();
-//				if (ObjectUtils.isNotEmpty(redisUtil.get(str))) {
-//					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str),
-//							SessionUser.class);
-//					if (StringUtils.isNotEmpty(sessionUser.getUserId())) {
-//						redisUtil.del(str);
-//						redisUtil.lRemove(Constant.USER, index, str);
-//						redisUtil.setRemove(Constant.ONLINE, str);
-//						product.offLine(str);
-//						continue;
-//					}
-//				}
-//				index++;
-//			}
-//		}
-		return ResultUtils.success(null);
+		ObjectMapper mapper = new ObjectMapper();
+		SessionUser sessionUser = mapper.readValue((String) redisUtil.get(token),
+				SessionUser.class);
+		if (Objects.isNull(sessionUser)) {
+			return ResultUtils.warn(ResultCode.USER_OFFLINE);
+		}
+		return ResultUtils.success("已成功");
 	}
 
 	@Override
@@ -169,9 +149,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 				msg.getMessage().setContent(message);
 			}
 			if (msg.getMessage().getContent().equals("leave")) {
-				redisUtil.setRemove(Constant.ONLINE, token);
 				String message = "[" + msg.getMessage().getFrom() + "]" + "离开聊天室,当前在线人数";
 				msg.getMessage().setContent(message);
+				redisUtil.setRemove(Constant.ONLINE, token);
+			}
+			if (msg.getMessage().getContent().equals("offline")) {
+				String message = "[" + msg.getMessage().getFrom() + "]" + "下线,当前在线人数";
+				msg.getMessage().setContent(message);
+				redisUtil.del(token);
+				redisUtil.lRemove(Constant.USER, 1, token);
+				redisUtil.setRemove(Constant.ONLINE, token);
 			}
 			Set<Object> set = redisUtil.sGet(Constant.ONLINE);
 			List list = new ArrayList();

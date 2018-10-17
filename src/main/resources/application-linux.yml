@@ -17,7 +17,7 @@ redisServerIp: 39.108.213.45
 #39.108.213.45
 redisServerPort: 6379
 
-userOutTime: 3000
+userOutTime: 30
 
 
 #服务ip

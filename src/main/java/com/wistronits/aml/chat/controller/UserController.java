@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -201,17 +202,6 @@ public class UserController {
 		return ResultUtils.success(currentUser);
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	@GetMapping("/offline/{token}")
-	public Result offline(@PathVariable("token") String token) throws Exception {
-		if (StringUtils.isEmpty(token)) {
-			return ResultUtils.warn(ResultCode.PARAMETER_ERROR);
-		}
-		return iUserService.offline(token);
-	}
 
 	/**
 	 * 获取指定目录下的头像

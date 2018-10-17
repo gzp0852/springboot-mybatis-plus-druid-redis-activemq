@@ -4,21 +4,21 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>WebChat | 聊天</title>
-		<link rel="stylesheet" href="plugins/amaze/css/amazeui.min.css">
-		<link rel="stylesheet" href="plugins/amaze/css/admin.css">
-		<link rel="stylesheet" href="plugins/contextjs/css/context.standalone.css">
-		<script src="plugins/jquery/jquery-2.1.4.min.js"></script>
-		<script src="plugins/amaze/js/amazeui.min.js"></script>
-		<script src="plugins/amaze/js/app.js"></script>
-		<script src="plugins/layer/layer.js"></script>
-		<script src="plugins/laypage/laypage.js"></script>
-		<script src="plugins/contextjs/js/context.js"></script>
-		<script src="source/js/sockjs.min.js"></script>
-		<script src="source/js/stomp.min.js"></script>
-		<script src="source/js/url.js"></script>
+		<link rel="stylesheet" href="../plugins/amaze/css/amazeui.min.css">
+		<link rel="stylesheet" href="../plugins/amaze/css/admin.css">
+		<link rel="stylesheet" href="../plugins/contextjs/css/context.standalone.css">
+		<script src="../plugins/jquery/jquery-2.1.4.min.js"></script>
+		<script src="../plugins/amaze/js/amazeui.min.js"></script>
+		<script src="../plugins/amaze/js/app.js"></script>
+		<script src="../plugins/layer/layer.js"></script>
+		<script src="../plugins/laypage/laypage.js"></script>
+		<script src="../plugins/contextjs/js/context.js"></script>
+		<script src="js/sockjs.min.js"></script>
+		<script src="js/stomp.min.js"></script>
+		<script src="js/url.js"></script>
 	</head>
 
-	<body onbeforeunload="checkLeave()">
+	<body>
 		<div>
 			<header class="am-topbar admin-header">
 				<div class="am-topbar-brand">
@@ -39,7 +39,7 @@
 									<a href="info-setting.html"><span class="am-icon-cog"></span> 设置</a>
 								</li>
 								<li>
-									<a href=""><span class="am-icon-power-off"></span> 注销</a>
+									<a href="javascript:void(0)" onclick="offline()"><span class="am-icon-power-off"></span> 注销</a>
 								</li>
 							</ul>
 						</li>
@@ -48,7 +48,48 @@
 			</header>
 		</div>
 		<div class="am-cf admin-main">
-			<div data-include="sidebar"></div>
+			<div class="admin-sidebar am-offcanvas" id="admin-offcanvas">
+				<div class="am-offcanvas-bar admin-offcanvas-bar">
+					<ul class="am-list admin-sidebar-list">
+						<li>
+							<a href="index.html"><span class="am-icon-commenting"></span> 聊天</a>
+						</li>
+						<li>
+							<a href="information.html" class="am-cf"><span class="am-icon-book"></span> 个人信息<span class="am-icon-star am-fr am-margin-right admin-icon-yellow"></span></a>
+						</li>
+						<li class="admin-parent">
+							<a class="am-cf" data-am-collapse="{target: '#collapse-nav'}"><span class="am-icon-cogs"></span> 设置 <span class="am-icon-angle-right am-fr am-margin-right"></span></a>
+							<ul class="am-list am-collapse admin-sidebar-sub am-in" id="collapse-nav">
+								<!--class=am-in 默认展开-->
+								<li>
+									<a href="info-setting.html"><span class="am-icon-group"></span> 个人设置</a>
+								</li>
+								<li>
+									<a href="system-setting.html"><span class="am-icon-cog"></span> 系统设置</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="log.html"><span class="am-icon-inbox"></span> 系统日志<span class="am-badge am-badge-secondary am-margin-right am-fr">5</span></a>
+						</li>
+						<li>
+							<a href="help.html"><span class="am-icon-globe"></span> 帮助</a>
+						</li>
+						<li>
+							<a href="about.html"><span class="am-icon-leaf"></span> 关于</a>
+						</li>
+						<li>
+							<a href="javascript:void(0)" onclick="offline()"><span class="am-icon-sign-out"></span> 注销</a>
+						</li>
+					</ul>
+					<div class="am-panel am-panel-default admin-sidebar-panel">
+						<div class="am-panel-bd">
+							<p><span class="am-icon-tag"></span> Welcome</p>
+							<p>欢迎使用WebChat聊天室~</p>
+						</div>
+					</div>
+				</div>
+			</div>
 			<!-- content start -->
 			<div class="admin-content">
 
@@ -229,8 +270,7 @@
 				$("#firsttime").val(result.data.registerTime);
 				$("#lasttime").val(result.data.lastTime);
 				var img = document.getElementById("profilehead");
-				img.src = img.src = `${url}`+'/chat/user/img/'+result.data.profilehead + "?" + new Date().getTime();
-
+				img.src = `${url}` + '/chat/user/img/' + result.data.profilehead + "?" + new Date().getTime();
 			} else if(result.code != 0) {
 				console.log("2" + result.msg);
 			}
@@ -314,9 +354,9 @@
 						offset: 0
 					});
 					var img = document.getElementById("profilehead");
-					img.src = `${url}`+'/chat/user/img/'+result.data.profilehead + "?" + new Date().getTime();
+					img.src = `${url}` + '/chat/user/img/' + result.data.profilehead + "?" + new Date().getTime();
 				} else if(result.code != 0) {
-					console.log("错误代码:" + result.code+", 错误原因:"+result.msg);
+					console.log("错误代码:" + result.code + ", 错误原因:" + result.msg);
 					layer.msg("修改失败", {
 						offset: 0
 					});
@@ -327,8 +367,8 @@
 			}
 		});
 	}
-	
-	function getImg(path1){
+
+	function getImg(path1) {
 		$.ajax({
 			type: "post",
 			contentType: 'application/json',
@@ -357,13 +397,13 @@
 
 		});
 	}
-	
+
 	function updataPwd() {
 		var password1 = $("#password1").val();
 		var password2 = $("#password2").val();
 		var password3 = $("#password3").val();
-		
-		if (password2 == password3) {
+
+		if(password2 == password3) {
 			$.ajax({
 				type: "post",
 				contentType: 'application/json',
@@ -389,13 +429,13 @@
 						});
 					}
 				}
-	
+
 			});
-		}else {
+		} else {
 			layer.msg("请确认新密码", {
 				offset: 0
 			});
 		}
-		
+
 	}
 </script>

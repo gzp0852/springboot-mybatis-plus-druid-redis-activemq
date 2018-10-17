@@ -4,21 +4,22 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>WebChat | 聊天</title>
-		<link rel="stylesheet" href="plugins/amaze/css/amazeui.min.css">
-		<link rel="stylesheet" href="plugins/amaze/css/admin.css">
-		<link rel="stylesheet" href="plugins/contextjs/css/context.standalone.css">
-		<script src="plugins/jquery/jquery-2.1.4.min.js"></script>
-		<script src="plugins/amaze/js/amazeui.min.js"></script>
-		<script src="plugins/amaze/js/app.js"></script>
-		<script src="plugins/layer/layer.js"></script>
-		<script src="plugins/laypage/laypage.js"></script>
-		<script src="plugins/contextjs/js/context.js"></script>
-		<script src="source/js/sockjs.min.js"></script>
-		<script src="source/js/stomp.min.js"></script>
-		<script src="source/js/url.js"></script>
+		<link rel="stylesheet" href="../plugins/amaze/css/amazeui.min.css">
+		<link rel="stylesheet" href="../plugins/amaze/css/admin.css">
+		<link rel="stylesheet" href="../plugins/contextjs/css/context.standalone.css">
+		<script src="../plugins/jquery/jquery-2.1.4.min.js"></script>
+		<script src="../plugins/amaze/js/amazeui.min.js"></script>
+		<script src="../plugins/amaze/js/app.js"></script>
+		<script src="../plugins/layer/layer.js"></script>
+		<script src="../plugins/laypage/laypage.js"></script>
+		<script src="../plugins/contextjs/js/context.js"></script>
+		<script src="js/sockjs.min.js"></script>
+		<script src="js/stomp.min.js"></script>
+		<script src="js/url.js"></script>
 	</head>
 
 	<body onbeforeunload="checkLeave()">
+	<!--<body>-->
 		<div>
 			<header class="am-topbar admin-header">
 				<div class="am-topbar-brand">
@@ -39,7 +40,7 @@
 									<a href="info-setting.html"><span class="am-icon-cog"></span> 设置</a>
 								</li>
 								<li>
-									<a href=""><span class="am-icon-power-off"></span> 注销</a>
+									<a href="javascript:void(0)" onclick="offline()"><span class="am-icon-power-off"></span> 注销</a>
 								</li>
 							</ul>
 						</li>
@@ -47,7 +48,48 @@
 				</div>
 			</header>
 			<div class="am-cf admin-main">
-				<div data-include="sidebar"></div>
+				<div class="admin-sidebar am-offcanvas" id="admin-offcanvas">
+					<div class="am-offcanvas-bar admin-offcanvas-bar">
+						<ul class="am-list admin-sidebar-list">
+							<li>
+								<a href="index.html"><span class="am-icon-commenting"></span> 聊天</a>
+							</li>
+							<li>
+								<a href="information.html" class="am-cf"><span class="am-icon-book"></span> 个人信息<span class="am-icon-star am-fr am-margin-right admin-icon-yellow"></span></a>
+							</li>
+							<li class="admin-parent">
+								<a class="am-cf" data-am-collapse="{target: '#collapse-nav'}"><span class="am-icon-cogs"></span> 设置 <span class="am-icon-angle-right am-fr am-margin-right"></span></a>
+								<ul class="am-list am-collapse admin-sidebar-sub " id="collapse-nav">
+									<!--class=am-in 默认展开-->
+									<li>
+										<a href="info-setting.html"><span class="am-icon-group"></span> 个人设置</a>
+									</li>
+									<li>
+										<a href="system-setting.html"><span class="am-icon-cog"></span> 系统设置</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href="log.html"><span class="am-icon-inbox"></span> 系统日志<span class="am-badge am-badge-secondary am-margin-right am-fr">5</span></a>
+							</li>
+							<li>
+								<a href="help.html"><span class="am-icon-globe"></span> 帮助</a>
+							</li>
+							<li>
+								<a href="about.html"><span class="am-icon-leaf"></span> 关于</a>
+							</li>
+							<li>
+								<a href="javascript:void(0)" onclick="offline()"><span class="am-icon-sign-out"></span> 注销</a>
+							</li>
+						</ul>
+						<div class="am-panel am-panel-default admin-sidebar-panel">
+							<div class="am-panel-bd">
+								<p><span class="am-icon-tag"></span> Welcome</p>
+								<p>欢迎使用WebChat聊天室~</p>
+							</div>
+						</div>
+					</div>
+				</div>
 				<!-- content start -->
 				<div class="admin-content">
 					<div class="" style="width: 80%;float:left;">
@@ -107,13 +149,6 @@
 		});
 	});
 
-	function isLogin() {
-		var token = localStorage.getItem("token");
-		console.log(token);
-		if(!token) {
-			location.href = 'login.html';
-		}
-	}
 	var user = JSON.parse(localStorage.getItem("currUser"));
 	var userid = user.userName;
 	document.getElementById("userid").innerHTML = userid;
@@ -145,8 +180,6 @@
 		//链接SockJS 的endpoint 名称为"/endpointWisely"
 		var socket = new SockJS(`${url}/chat/chatEndpointWisely`);
 		stompClient = Stomp.over(socket);
-		stompClient.heartbeat.outgoing = 1000;
-		stompClient.heartbeat.incoming = 1000;
 		//使用stomp子协议的WebSocket 客户端
 		console.log(stompClient);
 		stompClient.connect({}, function(frame) { //链接Web Socket的服务端。
@@ -185,11 +218,9 @@
 
 				stompClient.subscribe('/chatTopic/user/' + token, function(respnose) { //订阅/topic/getResponse 目标发送的消息。这个是在控制器的@SendTo中定义的。
 					if(respnose.body) {
-						localStorage.removeItem("currUser");
-						localStorage.removeItem("token");
-						location.href = 'login.html';
 						alert(respnose.body.toString());
-						disconnect();
+						offline();
+//						disconnect();
 					}
 				});
 				stompClient.subscribe('/chatTopic/users/', function(respnose) { //订阅/topic/getResponse 目标发送的消息。这个是在控制器的@SendTo中定义的。
@@ -310,6 +341,7 @@
 			success: function(result) {
 				if(result.code == 0) {
 					console.log("1" + result.msg);
+				    $("#message").val(""); //清空输入区
 				} else if(result.code != 0) {
 					console.log("2" + result.msg);
 				}
@@ -360,15 +392,14 @@
 		//		        var html = "<li class=\"am-comment "+isSef+" am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"${url}/"+message.from+"/head\"></a><div class=\"am-comment-main\">\n" +
 		//		                "<header class=\"am-comment-hd\"><div class=\"am-comment-meta\">   <a class=\"am-comment-author\" href=\"#link-to-user\">"+message.from+"</a> 发表于<time> "+message.time+"</time> 发送给: "+to+" </div></header><div class=\"am-comment-bd\"> <p>"+message.content+"</p></div></div></li>";
 		if(userid == message.from) {
-			var html = `<li class="am-comment am-comment-flip am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${message.user.profilehead}"></a><div class="am-comment-main"
+			var html = `<li class="am-comment am-comment-flip am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
 		        	<header class="am-comment-hd"><div class="am-comment-meta"><a class="am-comment-author" href="#link-to-user"> ${message.from} </a> 发表于<time>${message.time}</time> 发送给:${to} </div></header><div class="am-comment-bd"> <p>${message.content}</p></div></div></li>`;
 		} else {
-			var html = `<li class="am-comment am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${message.user.profilehead}"></a><div class="am-comment-main"
+			var html = `<li class="am-comment am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
 		        	<header class="am-comment-hd"><div class="am-comment-meta"><a class="am-comment-author" href="#link-to-user"> ${message.from} </a> 发表于<time>${message.time}</time> 发送给:${to} </div></header><div class="am-comment-bd"> <p>${message.content}</p></div></div></li>`;
 		}
 
 		$("#chat").append(html);
-		$("#message").val(""); //清空输入区
 		var chat = $("#chat-view");
 		chat.scrollTop(chat[0].scrollHeight); //让聊天区始终滚动到最下面
 	}
@@ -381,7 +412,7 @@
 		$.each(list, function(index, item) { //添加私聊按钮
 			var li = "<li>" + item.username + "</li>";
 			if(userid != item.username) { //排除自己
-				li = "<li>" + item.username /*+ " <button type=\"button\" class=\"am-btn am-btn-xs am-btn-primary am-round\" onclick=\"addChat('" + item.username + "');\"><span class=\"am-icon-phone\"><span> 私聊</button></li>"*/;
+				li = "<li>" + item.username /*+ " <button type=\"button\" class=\"am-btn am-btn-xs am-btn-primary am-round\" onclick=\"addChat('" + item.username + "');\"><span class=\"am-icon-phone\"><span> 私聊</button></li>"*/ ;
 			}
 			$("#list").append(li);
 		});
@@ -396,11 +427,11 @@
 		var html;
 		$.getJSON("http://www.tuling123.com/openapi/api?key=6ad8b4d96861f17d68270216c880d5e3&info=" + message, function(data) {
 			if(data.code == 100000) {
-				html = "<li class=\"am-comment am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"source/img/robot.jpg\"></a><div class=\"am-comment-main\">\n" +
+				html = "<li class=\"am-comment am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"img/robot.jpg\"></a><div class=\"am-comment-main\">\n" +
 					"<header class=\"am-comment-hd\"><div class=\"am-comment-meta\">   <a class=\"am-comment-author\" href=\"#link-to-user\">Robot</a> 发表于<time> " + getDateFull() + "</time> 发送给: " + userid + "</div></header><div class=\"am-comment-bd\"> <p>" + data.text + "</p></div></div></li>";
 			}
 			if(data.code == 200000) {
-				html = "<li class=\"am-comment am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"source/img/robot.jpg\"></a><div class=\"am-comment-main\">\n" +
+				html = "<li class=\"am-comment am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"img/robot.jpg\"></a><div class=\"am-comment-main\">\n" +
 					"<header class=\"am-comment-hd\"><div class=\"am-comment-meta\">   <a class=\"am-comment-author\" href=\"#link-to-user\">Robot</a> 发表于<time> " + getDateFull() + "</time> 发送给: " + userid + "</div></header><div class=\"am-comment-bd\"> <p>" + data.text + "</p><a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a></div></div></li>";
 			}
 			$("#chat").append(html);
@@ -443,6 +474,6 @@
 		if(stompClient != null) {
 			closeConnection(); //自己要操作的事件，不需要可不用
 		}
-		event.returnValue = false;
+//		event.returnValue = false;
 	}
 </script>

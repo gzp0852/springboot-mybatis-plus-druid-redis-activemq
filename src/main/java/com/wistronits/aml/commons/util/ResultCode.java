@@ -25,7 +25,8 @@ public enum ResultCode {
 	SAVE_IMG_ERROE(30103, "保存图片失败"),
 	PASSWORD_NULL(10101, "密码不能为空"),
 	PASSWORD_ERR_OLD(10103, "原密码错误"),
-	PASSWORD_SAME(10102, "与原密码相同");
+	PASSWORD_SAME(10102, "与原密码相同"),
+	USER_OFFLINE(10002, "用户注销失败");
 
 
 

@@ -1,6 +1,9 @@
 package com.wistronits.aml.commons.websocket;
 
 import com.alibaba.fastjson.JSON;
+import com.wistronits.aml.chat.service.IUserService;
+import com.wistronits.aml.commons.Constant;
+import com.wistronits.aml.commons.redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,10 @@ public class WebSocketProduct {
 
     @Autowired
     private SimpMessagingTemplate template;
-
+    @Autowired
+    private RedisUtil redisUtil;
+    @Autowired
+    private IUserService iUserService;
     /**
      * 发送websocket消息
      *
@@ -53,6 +59,7 @@ public class WebSocketProduct {
      * 用户超时下线实时监控
      */
     public void userTimeOut(String token) {
+
         try {
             // 前缀
             String pre = "/chatTopic/user/";
