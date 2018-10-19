@@ -18,7 +18,7 @@
 		<script src="js/url.js"></script>
 	</head>
 
-	<body onbeforeunload="checkLeave()">
+	<body onbeforeunload="checkLeave()" onkeydown='if(event.keyCode==13){send.click()}'>
 		<!--<body>-->
 		<div>
 			<header class="am-topbar admin-header">
@@ -112,7 +112,7 @@
 							<button class="am-btn am-btn-default" type="button" onclick="closeConnection()"><span class="am-icon-remove"></span> 断开</button>
 							<button class="am-btn am-btn-default" type="button" onclick="checkConnection()"><span class="am-icon-bug"></span> 检查</button>-->
 							<button class="am-btn am-btn-default" type="button" onclick="clearConsole()"><span class="am-icon-trash-o"></span> 清屏</button>
-							<button class="am-btn am-btn-default" type="button" onclick="sendMessage()"><span class="am-icon-commenting"></span> 发送</button>
+							<button class="am-btn am-btn-default" type="button" onclick="sendMessage()" id="send"><span class="am-icon-commenting"></span> 发送</button>
 						</div>
 					</div>
 					<!-- 列表区 -->
@@ -179,7 +179,7 @@
 				success: function(result) {
 					if(result.code == 0) {
 						console.log("1" + result.data);
-//						showOnline(result.data);
+						//						showOnline(result.data);
 					} else if(result.code != 0) {
 						console.log("2" + result.msg);
 					}
@@ -207,7 +207,7 @@
 				success: function(result) {
 					if(result.code == 0) {
 						console.log("1" + result.data);
-//						showOnline(result.data);
+						//						showOnline(result.data);
 					} else if(result.code != 0) {
 						console.log("2" + result.msg);
 					}
@@ -256,7 +256,7 @@
 					success: function(result) {
 						if(result.code == 0) {
 							console.log("1" + result.data);
-							if (result.data.message.isTuling == "1") {
+							if(result.data.message.isTuling == "1") {
 								$("#tuling").text("已上线").removeClass("am-btn-danger").addClass("am-btn-success");
 							} else if(result.data.message.isTuling == "-1") {
 								$("#tuling").text("未上线").removeClass("am-btn-success").addClass("am-btn-danger");
@@ -272,7 +272,12 @@
 				stompClient.subscribe('/chatTopic/user/' + token, function(respnose) { //订阅/topic/getResponse 目标发送的消息。这个是在控制器的@SendTo中定义的。
 					if(respnose.body) {
 						alert(respnose.body.toString());
-						offline();
+						if(respnose.body.toString() == "您未登录！") {
+							localStorage.clear();
+							location.href = 'login.html';
+						} else {
+							offline();
+						}
 						//						disconnect();
 					}
 				});
@@ -433,10 +438,10 @@
 	function showNotice(notice) {
 		if(notice.isTuling == "1") {
 			$("#tuling").text("已上线").removeClass("am-btn-danger").addClass("am-btn-success");
-//			$("#onlinenum").text(parseInt(onlinenum) + 1);
+			//			$("#onlinenum").text(parseInt(onlinenum) + 1);
 		} else if(notice.isTuling == "-1") {
 			$("#tuling").text("未上线").removeClass("am-btn-success").addClass("am-btn-danger");
-//			$("#onlinenum").text(parseInt(onlinenum) - 1);
+			//			$("#onlinenum").text(parseInt(onlinenum) - 1);
 		}
 		$("#chat").append("<div><p class=\"am-text-success\" style=\"text-align:center\"><span class=\"am-icon-bell\"></span> " + notice.content + "</p></div>");
 		var chat = $("#chat-view");
@@ -454,7 +459,7 @@
 		if(userid == message.from) {
 			var html = `<li class="am-comment am-comment-flip am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
 		        	<header class="am-comment-hd"><div class="am-comment-meta"><a class="am-comment-author" href="#link-to-user"> ${message.from} </a> 发表于<time>${message.time}</time> 发送给:${to} </div></header><div class="am-comment-bd"> <p>${message.content}</p></div></div></li>`;
-		} else if(message.from == 100001){
+		} else if(message.from == 100001) {
 			var html = message.content;
 		} else {
 			var html = `<li class="am-comment am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
@@ -498,33 +503,33 @@
 			}
 			var to = $("#sendto").text() == "全体成员" ? "" : $("#sendto").text();
 			$.ajax({
-			type: "post",
-			contentType: 'application/json',
-			dataType: 'json',
-			beforeSend: function(request) {
-				request.setRequestHeader("token", localStorage.getItem("token"));
-			},
-			url: `${url}/chat/user/chatAll`,
-			async: false,
-			data: JSON.stringify({
-				message: {
-					content: html,
-					from: 100001,
-					to: to, //接收人,如果没有则置空,如果有多个接收人则用,分隔
-					time: getDateFull()
+				type: "post",
+				contentType: 'application/json',
+				dataType: 'json',
+				beforeSend: function(request) {
+					request.setRequestHeader("token", localStorage.getItem("token"));
 				},
-				type: "message"
-			}),
-			success: function(result) {
-				if(result.code == 0) {
-					console.log("1" + result.msg);
-				} else if(result.code != 0) {
-					console.log("2" + result.msg);
+				url: `${url}/chat/user/chatAll`,
+				async: false,
+				data: JSON.stringify({
+					message: {
+						content: html,
+						from: 100001,
+						to: to, //接收人,如果没有则置空,如果有多个接收人则用,分隔
+						time: getDateFull()
+					},
+					type: "message"
+				}),
+				success: function(result) {
+					if(result.code == 0) {
+						console.log("1" + result.msg);
+					} else if(result.code != 0) {
+						console.log("2" + result.msg);
+					}
 				}
-			}
 
-		});
-			
+			});
+
 		});
 	}
 
