@@ -41,6 +41,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	@Autowired
 	private WebSocketProduct product;
 
+	private static String isTuling = "-1";
+
 	@Override
 	public Boolean checkByName(String userName, String userId) {
 		// userId==null代表此时是新增时的校验
@@ -128,21 +130,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	}
 
 	@Override
-	public Result offline(String token) throws Exception{
+	public Messages chatAll(Messages msg, HttpServletRequest request) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		SessionUser sessionUser = mapper.readValue((String) redisUtil.get(token),
-				SessionUser.class);
-		if (Objects.isNull(sessionUser)) {
-			return ResultUtils.warn(ResultCode.USER_OFFLINE);
-		}
-		return ResultUtils.success("已成功");
-	}
-
-	@Override
-	public List chatAll(Messages msg, HttpServletRequest request) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
+		msg.getMessage().setIsTuling(isTuling);
 		if (msg.getType().equals("notice")) {
 			String token = request.getHeader("token");
+			SessionUser sessionUser = mapper.readValue(redisUtil.get(token).toString(),
+					SessionUser.class);
 			if (msg.getMessage().getContent().equals("join")) {
 				redisUtil.sSet(Constant.ONLINE, token);
 				String message = "[" + msg.getMessage().getFrom() + "]" + "进入聊天室,当前在线人数";
@@ -167,17 +161,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 						SessionUser.class);
 				list.add(user);
 			}
+			String content = msg.getMessage().getContent();
 			if (CollectionUtils.isNotEmpty(list)) {
 				msg.setList(list);
+				msg.getMessage().setContent(msg.getMessage().getContent() + list.size() + "人");
 			}
-			msg.getMessage().setContent(msg.getMessage().getContent() + list.size() + "人");
+			if (content.equals("tulingjoin")) {
+				String message = sessionUser.getUsername()+"启用图灵机器人";
+				msg.getMessage().setContent(message);
+				isTuling = "1";
+				msg.getMessage().setIsTuling(isTuling);
+			}
+			if (content.equals("tulingleave")) {
+				String message = sessionUser.getUsername()+"关闭图灵机器人";
+				msg.getMessage().setContent(message);
+				isTuling = "-1";
+				msg.getMessage().setIsTuling(isTuling);
+			}
 		}
 		User user = userMapper.getUser(msg.getMessage().getFrom());
 		msg.getMessage().setUser(user);
 		product.chatAll(BeanUtils.objectToJson(msg));
-		// todo
-		return msg.getList();
+		return msg;
 	}
+
 
 	@Override
 	public User getByUserId(String userId) {

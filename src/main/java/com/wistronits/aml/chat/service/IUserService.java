@@ -24,7 +24,7 @@ public interface IUserService extends IService<User> {
 
 	Result login(Map map, HttpServletRequest request) throws IOException;
 
-	List chatAll(Messages msg, HttpServletRequest request) throws IOException;
+	Messages chatAll(Messages msg, HttpServletRequest request) throws IOException;
 
 	User getByUserId(String userId);
 
@@ -32,5 +32,4 @@ public interface IUserService extends IService<User> {
 
 	void updatePwd(User user);
 
-	Result offline(String token) throws Exception;
 }

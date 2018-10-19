@@ -19,7 +19,7 @@
 	</head>
 
 	<body onbeforeunload="checkLeave()">
-	<!--<body>-->
+		<!--<body>-->
 		<div>
 			<header class="am-topbar admin-header">
 				<div class="am-topbar-brand">
@@ -159,13 +159,61 @@
 	$("#tuling").click(function() {
 		var onlinenum = $("#onlinenum").text();
 		if($(this).text() == "未上线") {
-			$(this).text("已上线").removeClass("am-btn-danger").addClass("am-btn-success");
-			showNotice("图灵机器人加入聊天室");
-			$("#onlinenum").text(parseInt(onlinenum) + 1);
+			$.ajax({
+				type: "post",
+				contentType: 'application/json',
+				dataType: 'json',
+				beforeSend: function(request) {
+					request.setRequestHeader("token", localStorage.getItem("token"));
+				},
+				url: `${url}/chat/user/chatAll`,
+				async: false,
+				data: JSON.stringify({
+					message: {
+						content: "tulingjoin",
+						from: 100001,
+						time: getDateFull()
+					},
+					type: "notice"
+				}),
+				success: function(result) {
+					if(result.code == 0) {
+						console.log("1" + result.data);
+//						showOnline(result.data);
+					} else if(result.code != 0) {
+						console.log("2" + result.msg);
+					}
+				}
+
+			});
 		} else {
-			$(this).text("未上线").removeClass("am-btn-success").addClass("am-btn-danger");
-			showNotice("图灵机器人离开聊天室");
-			$("#onlinenum").text(parseInt(onlinenum) - 1)
+			$.ajax({
+				type: "post",
+				contentType: 'application/json',
+				dataType: 'json',
+				beforeSend: function(request) {
+					request.setRequestHeader("token", localStorage.getItem("token"));
+				},
+				url: `${url}/chat/user/chatAll`,
+				async: false,
+				data: JSON.stringify({
+					message: {
+						content: "tulingleave",
+						from: 100002,
+						time: getDateFull()
+					},
+					type: "notice"
+				}),
+				success: function(result) {
+					if(result.code == 0) {
+						console.log("1" + result.data);
+//						showOnline(result.data);
+					} else if(result.code != 0) {
+						console.log("2" + result.msg);
+					}
+				}
+
+			});
 		}
 	});
 
@@ -208,7 +256,12 @@
 					success: function(result) {
 						if(result.code == 0) {
 							console.log("1" + result.data);
-							showOnline(result.data);
+							if (result.data.message.isTuling == "1") {
+								$("#tuling").text("已上线").removeClass("am-btn-danger").addClass("am-btn-success");
+							} else if(result.data.message.isTuling == "-1") {
+								$("#tuling").text("未上线").removeClass("am-btn-success").addClass("am-btn-danger");
+							}
+							showOnline(result.data.list);
 						} else if(result.code != 0) {
 							console.log("2" + result.msg);
 						}
@@ -220,7 +273,7 @@
 					if(respnose.body) {
 						alert(respnose.body.toString());
 						offline();
-//						disconnect();
+						//						disconnect();
 					}
 				});
 				stompClient.subscribe('/chatTopic/users/', function(respnose) { //订阅/topic/getResponse 目标发送的消息。这个是在控制器的@SendTo中定义的。
@@ -341,7 +394,7 @@
 			success: function(result) {
 				if(result.code == 0) {
 					console.log("1" + result.msg);
-				    $("#message").val(""); //清空输入区
+					$("#message").val(""); //清空输入区
 				} else if(result.code != 0) {
 					console.log("2" + result.msg);
 				}
@@ -378,6 +431,13 @@
 	 * 展示提示信息
 	 */
 	function showNotice(notice) {
+		if(notice.isTuling == "1") {
+			$("#tuling").text("已上线").removeClass("am-btn-danger").addClass("am-btn-success");
+//			$("#onlinenum").text(parseInt(onlinenum) + 1);
+		} else if(notice.isTuling == "-1") {
+			$("#tuling").text("未上线").removeClass("am-btn-success").addClass("am-btn-danger");
+//			$("#onlinenum").text(parseInt(onlinenum) - 1);
+		}
 		$("#chat").append("<div><p class=\"am-text-success\" style=\"text-align:center\"><span class=\"am-icon-bell\"></span> " + notice.content + "</p></div>");
 		var chat = $("#chat-view");
 		chat.scrollTop(chat[0].scrollHeight); //让聊天区始终滚动到最下面
@@ -394,6 +454,8 @@
 		if(userid == message.from) {
 			var html = `<li class="am-comment am-comment-flip am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
 		        	<header class="am-comment-hd"><div class="am-comment-meta"><a class="am-comment-author" href="#link-to-user"> ${message.from} </a> 发表于<time>${message.time}</time> 发送给:${to} </div></header><div class="am-comment-bd"> <p>${message.content}</p></div></div></li>`;
+		} else if(message.from == 100001){
+			var html = message.content;
 		} else {
 			var html = `<li class="am-comment am-comment-primary"><a href="link-to-user-home"><img width="48" height="48" class="am-comment-avatar" alt="" src="${url}/chat/user/img/${message.user.profilehead}"></a><div class="am-comment-main"
 		        	<header class="am-comment-hd"><div class="am-comment-meta"><a class="am-comment-author" href="#link-to-user"> ${message.from} </a> 发表于<time>${message.time}</time> 发送给:${to} </div></header><div class="am-comment-bd"> <p>${message.content}</p></div></div></li>`;
@@ -434,10 +496,35 @@
 				html = "<li class=\"am-comment am-comment-primary\"><a href=\"#link-to-user-home\"><img width=\"48\" height=\"48\" class=\"am-comment-avatar\" alt=\"\" src=\"img/robot.jpg\"></a><div class=\"am-comment-main\">\n" +
 					"<header class=\"am-comment-hd\"><div class=\"am-comment-meta\">   <a class=\"am-comment-author\" href=\"#link-to-user\">Robot</a> 发表于<time> " + getDateFull() + "</time> 发送给: " + userid + "</div></header><div class=\"am-comment-bd\"> <p>" + data.text + "</p><a href=\"" + data.url + "\" target=\"_blank\">" + data.url + "</a></div></div></li>";
 			}
-			$("#chat").append(html);
-			var chat = $("#chat-view");
-			chat.scrollTop(chat[0].scrollHeight);
-			$("#message").val(""); //清空输入区
+			var to = $("#sendto").text() == "全体成员" ? "" : $("#sendto").text();
+			$.ajax({
+			type: "post",
+			contentType: 'application/json',
+			dataType: 'json',
+			beforeSend: function(request) {
+				request.setRequestHeader("token", localStorage.getItem("token"));
+			},
+			url: `${url}/chat/user/chatAll`,
+			async: false,
+			data: JSON.stringify({
+				message: {
+					content: html,
+					from: 100001,
+					to: to, //接收人,如果没有则置空,如果有多个接收人则用,分隔
+					time: getDateFull()
+				},
+				type: "message"
+			}),
+			success: function(result) {
+				if(result.code == 0) {
+					console.log("1" + result.msg);
+				} else if(result.code != 0) {
+					console.log("2" + result.msg);
+				}
+			}
+
+		});
+			
 		});
 	}
 
@@ -474,6 +561,6 @@
 		if(stompClient != null) {
 			closeConnection(); //自己要操作的事件，不需要可不用
 		}
-//		event.returnValue = false;
+		//		event.returnValue = false;
 	}
 </script>

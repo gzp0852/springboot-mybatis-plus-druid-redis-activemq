@@ -14,5 +14,4 @@ public class Messages {
 	private Message message;
 	private String type;
 	private List list;
-
 }

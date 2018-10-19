@@ -14,4 +14,5 @@ public class Message {
 	private String to;
 	private String time;
 	private User user;
+	private String isTuling;
 }
