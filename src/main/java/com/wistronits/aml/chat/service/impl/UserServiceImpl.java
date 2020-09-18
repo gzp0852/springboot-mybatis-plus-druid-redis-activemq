@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.sql.Wrapper;
 import java.util.*;
 
 /**
@@ -98,7 +99,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 				if (ObjectUtils.isNotEmpty(redisUtil.get(str))) {
 					SessionUser sessionUser = mapper.readValue((String) redisUtil.get(str),
 							SessionUser.class);
-					if (sessionUser.getUserId().equals(user.getUserId())) {
+					if (sessionUser.getUserId().equals(user.getId())) {
 						product.offLine(str);
 						continue;
 					}
@@ -108,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 		// SessionUser
 		SessionUser sessionUser = new SessionUser();
-		sessionUser.setUserId(user.getUserId());
+		sessionUser.setUserId(user.getId());
 		sessionUser.setLoginDate(new Date());
 		sessionUser.setLoginIp(loginIp);
 		sessionUser.setUsername(user.getUserName());
@@ -125,7 +126,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 		user.setLastIp(loginIp);
 		user.setLastTime(latestLoginTime);
-		userMapper.updateByUserId(user);
+		userMapper.updateById(user);
 		return ResultUtils.success(data);
 	}
 
@@ -190,11 +191,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	public User getByUserId(String userId) {
 		User user = userMapper.getByUserId(userId);
 		return user;
-	}
-
-	@Override
-	public void updateByUserId(User user) {
-		userMapper.updateByUserId(user);
 	}
 
 	@Override

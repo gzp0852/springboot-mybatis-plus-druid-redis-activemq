@@ -2,8 +2,8 @@
 //const url= 'http://10.5.107.36:8081';
 //const url= 'http://10.5.112.117:8081';
 //const url = 'http://10.39.7.254:8081';
-const url = 'http://39.108.213.45:8081';
-
+// const url = 'http://39.108.213.45:8081';
+const url = 'http://localhost:8081';
 function isLogin() {
 	var token = localStorage.getItem("token");
 	console.log(token);

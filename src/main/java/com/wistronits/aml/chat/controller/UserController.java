@@ -64,12 +64,12 @@ public class UserController {
 		if (StringUtils.isEmpty(userName) || StringUtils.isEmpty(password)) {
 			return ResultUtils.warn(ResultCode.PARAMETER_ERROR, "用户名或密码不能为空");
 		}
-		boolean isExist = iUserService.checkByName(userName, user.getUserId());
+		boolean isExist = iUserService.checkByName(userName, user.getId());
 		if (!isExist) {
 			return ResultUtils.warn(ResultCode.PARAMETER_ERROR, "用户名重复");
 		}
 		user.setUserCode(RandomUtils.random6());
-		user.setUserId(UuidUtil.getTimeBasedUuid().toString());
+		user.setId(UuidUtil.getTimeBasedUuid().toString());
 		user.setPassword(Md5.encode(password));
 		iUserService.save(user);
 		return ResultUtils.success(user);
@@ -128,7 +128,7 @@ public class UserController {
 	@PostMapping("/update")
 	public Result update(@RequestBody User user) {
 		if (Objects.nonNull(user)) {
-			iUserService.updateByUserId(user);
+			iUserService.updateById(user);
 			return ResultUtils.success(user);
 		} else {
 			return ResultUtils.warn(ResultCode.PARAMETER_ERROR, "修改失败");
@@ -194,7 +194,7 @@ public class UserController {
 			if (StringUtils.isNotBlank(file_name)) {
 				String hostAddress1 = file_name;
 				currentUser.setProfilehead(hostAddress1);
-				iUserService.updateByUserId(currentUser);
+				iUserService.updateById(currentUser);
 			}
 			logger.info("返回值：{}", currentUser);
 		} catch (IOException e) {

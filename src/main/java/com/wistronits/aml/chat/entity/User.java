@@ -1,9 +1,13 @@
 package com.wistronits.aml.chat.entity;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
 
 /**
  * <p>
@@ -20,7 +24,8 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String userId;
+    @TableId(value = "user_id", type = IdType.UUID)
+    private String id;
 
     private String userCode;
 
@@ -49,7 +54,7 @@ public class User implements Serializable {
     /**
      * 是否被删除  1代表被删除   -1不可删除
      */
-    private String deleted;
+    private boolean deleted;
 
 
 }

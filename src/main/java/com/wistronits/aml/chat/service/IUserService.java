@@ -28,8 +28,6 @@ public interface IUserService extends IService<User> {
 
 	User getByUserId(String userId);
 
-	void updateByUserId(User user);
-
 	void updatePwd(User user);
 
 }

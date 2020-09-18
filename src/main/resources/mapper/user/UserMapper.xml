@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wistronits.aml.chat.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.wistronits.aml.chat.entity.User">
+        <id property="id" column="user_id"/>
+        <result property="userCode" column="user_code"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="profile" column="profile"/>
+        <result property="profilehead" column="profilehead"/>
+        <result property="registerTime" column="register_time"/>
+        <result property="lastTime" column="last_time"/>
+        <result property="status" column="status"/>
+        <result property="lastIp" column="last_ip"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <select id="checkByName" parameterType="string" resultMap="userMap">
+        select * from user where user_name = #{userName} and user_id = #{userId} and deleted = 0
+    </select>
+
+    <select id="getUser" resultMap="userMap" parameterType="string">
+        select * from user where deleted = 0 and user_name = #{userName}
+    </select>
+
+    <select id="getByUserId" resultMap="userMap" parameterType="string">
+        select * from user where deleted = 0 and user_id = #{userId}
+    </select>
+
+    <update id="updatePwd" parameterType="com.wistronits.aml.chat.entity.User">
+        update user set password = #{user.password}
+    </update>
+</mapper>
