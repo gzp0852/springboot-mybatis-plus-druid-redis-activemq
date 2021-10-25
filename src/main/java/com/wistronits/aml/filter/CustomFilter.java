@@ -57,8 +57,8 @@ public class CustomFilter implements Filter {
 		request = (HttpServletRequest) servletRequest;
 		response = (HttpServletResponse) servletResponse;
 
-		// this.chain.doFilter(request, response);
-		// 获取当前页面文件名处url
+		 this.chain.doFilter(request, response);
+		/*// 获取当前页面文件名处url
 		if (isLoginOperation(this.request)) {
 			logger.info("登录状态");
 			// 执行操作后必须doFilter
@@ -92,8 +92,7 @@ public class CustomFilter implements Filter {
 				redisUtil.set(token, objectMapper.writeValueAsString(user));
 				this.chain.doFilter(request, response);
 			}
-		}
-
+		}*/
 	}
 
 	@Override
@@ -117,8 +116,9 @@ public class CustomFilter implements Filter {
 		String img = "/chat/user/img";
 		String source = "/source";
 		String plugins = "/plugins";
+		String test = "/redis_test/test";
 		return url.contains(login) || url.contains(websocket) || url.contains(img) || url.contains(source)
-				|| url.contains(plugins);
+				|| url.contains(plugins) || url.contains(test);
 	}
 
 	/**

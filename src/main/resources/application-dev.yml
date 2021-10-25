@@ -1,9 +1,14 @@
 #数据库配置信息
-dbIp: 39.108.213.45
+#dbIp: 39.108.213.45
+#dbPort: 3306
+#dbName: chat
+#dbUser: gzp
+#dbPwd: gzp
+dbIp: localhost
 dbPort: 3306
 dbName: chat
-dbUser: gzp
-dbPwd: gzp
+dbUser: root
+dbPwd: root
 ##mongoDB配置信息
 #mongoIp: 10.5.43.18
 #mongoPort: 27017
@@ -13,7 +18,8 @@ img:
   location: F://PPPP/file
 
 #redis的配置
-redisServerIp: 39.108.213.45
+#redisServerIp: 39.108.213.45
+redisServerIp: localhost
 #39.108.213.45
 redisServerPort: 6379
 
@@ -22,8 +28,9 @@ userOutTime: 10
 
 
 #服务ip
-serverIp: 10.39.7.254
+#serverIp: 10.39.7.254
 #serverIp: 39.108.213.45
+serverIp: localhost
 serverPort: 8081
 
 server:
